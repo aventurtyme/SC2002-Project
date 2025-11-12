@@ -15,52 +15,35 @@ public class LoginService implements LoginInterface {
         this.userMap = new HashMap<>();
         this.credentials = new HashMap<>();
         this.credentialsFile = credentialsFile;
-        users.forEach(u -> userMap.put(u.getId(), u));
+        for (User u : users) {
+            userMap.put(u.getId(), u);
+            credentials.putIfAbsent(u.getId(), u.getPassword());
+        }
         loadCredentials();
     }
 
     @Override
     public boolean login(String idOrEmail, String password) {
-        if (!userMap.containsKey(idOrEmail)) {
-            System.out.println("[Error] User not found.");
-            return false;
-        }
-        User user = userMap.get(idOrEmail);
-        if (user instanceof CompanyRepresentative rep && !rep.isApproved()) {
-            System.out.println("[Error] Company Representative not approved yet.");
-            return false;
-        }
-        String stored = credentials.getOrDefault(idOrEmail, user.getPassword());
-        if (!Objects.equals(stored, password)) {
-            System.out.println("[Error] Incorrect password.");
-            return false;
-        }
-        currentUser = user;
-        System.out.println("[Login Successful] Welcome, " + user.getName() + " (" + user.getRole() + ")");
+        User u = userMap.get(idOrEmail);
+        if (u == null) { System.out.println("[Error] User not found."); return false; }
+        String stored = credentials.getOrDefault(idOrEmail, u.getPassword());
+        if (!Objects.equals(stored, password)) { System.out.println("[Error] Wrong password."); return false; }
+        currentUser = u;
+        System.out.println("[Login] Welcome, " + u.getName());
         return true;
     }
 
     @Override
-    public void logout() {
-        if (currentUser != null) {
-            System.out.println("[Logout] Bye, " + currentUser.getName());
-            currentUser = null;
-        }
-    }
+    public void logout() { currentUser = null; }
 
     @Override
     public boolean changePassword(String idOrEmail, String oldPwd, String newPwd) {
-        if (!userMap.containsKey(idOrEmail)) {
-            System.out.println("[Error] User not found.");
-            return false;
-        }
-        String stored = credentials.getOrDefault(idOrEmail, userMap.get(idOrEmail).getPassword());
-        if (!stored.equals(oldPwd)) {
-            System.out.println("[Error] Old password incorrect.");
-            return false;
-        }
+        User u = userMap.get(idOrEmail);
+        if (u == null) { System.out.println("[Error] User not found."); return false; }
+        String stored = credentials.getOrDefault(idOrEmail, u.getPassword());
+        if (!Objects.equals(stored, oldPwd)) { System.out.println("[Error] Old password incorrect."); return false; }
         credentials.put(idOrEmail, newPwd);
-        userMap.get(idOrEmail).setPassword(newPwd);
+        u.setPassword(newPwd);
         saveCredentials();
         System.out.println("[Password Changed] Please log in again.");
         return true;
@@ -69,9 +52,9 @@ public class LoginService implements LoginInterface {
     @Override
     public Optional<User> currentUser() { return Optional.ofNullable(currentUser); }
 
-    // ------------------- Helpers -------------------
+    // -------- helpers --------
     private void loadCredentials() {
-        if (!Files.exists(credentialsFile)) return;
+        if (credentialsFile == null || !Files.exists(credentialsFile)) return;
         try (BufferedReader br = Files.newBufferedReader(credentialsFile)) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -85,6 +68,7 @@ public class LoginService implements LoginInterface {
     }
 
     private void saveCredentials() {
+        if (credentialsFile == null) return;
         try (BufferedWriter bw = Files.newBufferedWriter(credentialsFile)) {
             for (Map.Entry<String, String> e : credentials.entrySet()) {
                 bw.write(e.getKey() + "," + e.getValue());
