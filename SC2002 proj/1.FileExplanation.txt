@@ -1,7 +1,0 @@
-New files added:
-1. ApplicationException -> exeption class for handling errors specific to applications
-2. ApplicationRepository -> manages storage and retrieval of internship application objects
-3. ApplicationStatus -> enum that represents states of application [also links to InternshipStatus]
-4. ApplicationValidator -> checks validity of applications before being saved or processed
-5. InternsipRepository -> manages storage and retrieval of internship objects
-6. UserRepository -> manages storage and retrieval of user objects
