@@ -1,1 +1,6 @@
-CompanyRepID,Name,CompanyName,Department,Position,Email,Status
+UserID,Name,Company,Department,Position,Email,Status
+rep001,Mr Tan Boon Kiat,ByteWorks,HR,Recruitment Manager,rep001@byteworks.com,APPROVED
+rep002,Ms Clara Lim,FinEdge,Finance,Senior Talent Lead,rep002@finedge.com,APPROVED
+rep003,Mr Ong Wei Xiang,DataCraft,Engineering,Project Engineer,rep003@datacraft.com,APPROVED
+rep004,Ms Nur Aisyah,AgroTech Solutions,R&D,Product Analyst,rep004@agrotech.com,APPROVED
+rep005,Mr Kelvin Low,GreenSpark Technologies,Sustainability,Operations Manager,rep005@greenspark.com,PENDING
